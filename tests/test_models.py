@@ -1,5 +1,6 @@
 """Tests for data models."""
-from dataclasses import asdict
+from datetime import datetime, timezone
+
 from src.models import (
     Message, ToolCall, ToolResult, GuardrailResult,
     Feedback, FeedbackType, LLMResponse, Session, Action, CommandLevel,
@@ -35,7 +36,7 @@ def test_tool_result_fields():
 
 def test_guardrail_result_blocked():
     result = GuardrailResult(
-        allowed=False, level="dangerous",
+        allowed=False, level=CommandLevel.DANGEROUS,
         reason="rm -rf is forbidden", requires_hitl=True, blocked=True,
     )
     assert result.blocked is True
@@ -44,7 +45,7 @@ def test_guardrail_result_blocked():
 
 def test_guardrail_result_allowed():
     result = GuardrailResult(
-        allowed=True, level="safe",
+        allowed=True, level=CommandLevel.SAFE,
         reason=None, requires_hitl=False, blocked=False,
     )
     assert result.blocked is False
@@ -109,14 +110,79 @@ def test_command_level_enum():
 
 
 def test_session_fields():
-    from datetime import datetime
     session = Session(
         id="abc-123",
         task="Run tests",
         status="running",
         turns=0,
-        created_at=datetime.now(),
+        created_at=datetime.now(timezone.utc),
         completed_at=None,
     )
     assert session.status == "running"
     assert session.turns == 0
+
+
+def test_guardrail_result_contradictory_state_raises():
+    """allowed and blocked must be opposites."""
+    import pytest
+    with pytest.raises(ValueError, match="allowed and blocked must be opposites"):
+        GuardrailResult(allowed=True, blocked=True, level=CommandLevel.SAFE)
+    with pytest.raises(ValueError, match="allowed and blocked must be opposites"):
+        GuardrailResult(allowed=False, blocked=False, level=CommandLevel.SAFE)
+
+
+def test_guardrail_result_default_level():
+    """level defaults to SAFE when not specified."""
+    result = GuardrailResult(allowed=True, blocked=False)
+    assert result.level == CommandLevel.SAFE
+
+
+def test_feedback_all_defaults():
+    """Feedback with only required fields uses correct defaults."""
+    fb = Feedback(type=FeedbackType.UNKNOWN, summary="test", detail="details")
+    assert fb.suggestion == ""
+    assert fb.failed_count == 0
+    assert fb.passed_count == 0
+
+
+def test_tool_result_empty_strings():
+    """ToolResult handles empty stdout and stderr."""
+    result = ToolResult(
+        tool_call_id="call_1",
+        tool_name="run_shell",
+        success=True,
+        stdout="",
+        stderr="",
+        exit_code=0,
+    )
+    assert result.stdout == ""
+    assert result.stderr == ""
+
+
+def test_message_with_tool_call_id_and_name():
+    """Message with tool role, tool_call_id, and name."""
+    msg = Message(
+        role="tool",
+        content="result",
+        tool_call_id="call_1",
+        name="run_shell",
+    )
+    assert msg.role == "tool"
+    assert msg.tool_call_id == "call_1"
+    assert msg.name == "run_shell"
+
+
+def test_session_with_completed_at():
+    """Session with completed_at timestamp."""
+    now = datetime.now(timezone.utc)
+    session = Session(
+        id="abc-123",
+        task="Run tests",
+        status="completed",
+        turns=5,
+        created_at=now,
+        completed_at=now,
+    )
+    assert session.status == "completed"
+    assert session.turns == 5
+    assert session.completed_at == now

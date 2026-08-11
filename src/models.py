@@ -1,6 +1,6 @@
 """Core data models for the Coding Agent Harness."""
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Literal, Optional
 
@@ -49,10 +49,16 @@ class ToolResult:
 @dataclass
 class GuardrailResult:
     allowed: bool
-    level: str
+    level: CommandLevel = CommandLevel.SAFE
     reason: Optional[str] = None
     requires_hitl: bool = False
     blocked: bool = False
+
+    def __post_init__(self):
+        if self.allowed == self.blocked:
+            raise ValueError(
+                f"allowed and blocked must be opposites, got allowed={self.allowed}, blocked={self.blocked}"
+            )
 
 
 @dataclass
@@ -69,7 +75,7 @@ class Feedback:
 class LLMResponse:
     content: Optional[str] = None
     tool_calls: Optional[list[ToolCall]] = None
-    finish_reason: str = "stop"
+    finish_reason: Literal["stop", "tool_calls", "length"] = "stop"
     usage: Optional[dict[str, int]] = None
 
 
@@ -85,5 +91,5 @@ class Session:
     task: str
     status: str = "running"
     turns: int = 0
-    created_at: datetime = field(default_factory=datetime.now)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     completed_at: Optional[datetime] = None
