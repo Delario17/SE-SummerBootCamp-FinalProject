@@ -1,0 +1,12 @@
+# .gitlab-ci.yml — CI Pipeline for Coding Agent Harness
+stages:
+  - test
+
+unit-test:
+  stage: test
+  image: python:3.11
+  before_script:
+    - pip install -e ".[dev]"
+  script:
+    - pytest tests/ -v --tb=short
+  coverage: '/TOTAL.*\s+(\d+%)$/'
