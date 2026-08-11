@@ -16,20 +16,15 @@ class HITLGuard:
         self._input_func = input_func or input
 
     async def check(self, action: Action) -> GuardrailResult:
-        """Check if the action requires HITL approval. Does not prompt.
+        """HITLGuard check is a pass-through — does not block or set requires_hitl.
 
-        The pipeline only evaluates -- actual prompting is done by the agent
-        loop when requires_hitl is True.
+        The CommandClassifier is responsible for setting requires_hitl on
+        dangerous commands. The pipeline propagates that flag. Actual user
+        prompting is done by request_approval() called from the agent loop.
         """
-        if action.tool_name != "run_shell":
-            return GuardrailResult(
-                allowed=True, level="safe",
-                reason=None, requires_hitl=False, blocked=False,
-            )
         return GuardrailResult(
-            allowed=True, level="dangerous",
-            reason="requires human approval",
-            requires_hitl=True, blocked=False,
+            allowed=True, level="safe",
+            reason=None, requires_hitl=False, blocked=False,
         )
 
     async def request_approval(self, action: Action) -> GuardrailResult:

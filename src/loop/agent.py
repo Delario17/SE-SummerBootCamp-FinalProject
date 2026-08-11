@@ -124,31 +124,42 @@ class AgentLoop:
                             result.summary = "Guardrail blocked 3 consecutive actions"
                             break
                     elif guard_result.requires_hitl:
-                        # HITL approval
-                        from src.guardrails.hitl import HITLGuard
-                        hitl = HITLGuard(
-                            timeout=self._config.get("guardrails", {}).get("hitl", {}).get("timeout", 30)
-                        )
-                        hitl_result = await hitl.request_approval(action)
-                        if hitl_result.blocked:
-                            tool_result = ToolResult(
-                                tool_call_id=tc.id,
-                                tool_name=tc.name,
-                                success=False,
-                                stdout="",
-                                stderr=f"HITL rejected: {hitl_result.reason}",
-                                exit_code=-1,
-                            )
-                            await self._memory.log_audit(
-                                session.id, "hitl_reject",
-                                {"tool": tc.name, "args": tc.arguments, "reason": hitl_result.reason},
-                            )
-                        else:
+                        # Check if HITL is enabled in config
+                        hitl_enabled = self._config.get("guardrails", {}).get("hitl", {}).get("enabled", True)
+                        if not hitl_enabled:
+                            # HITL disabled — execute the tool directly
+                            consecutive_blocks = 0
                             tool_result = await execute_tool(tc, timeout=self._shell_timeout)
                             await self._memory.log_audit(
-                                session.id, "hitl_approve",
-                                {"tool": tc.name, "args": tc.arguments},
+                                session.id, "tool_execute",
+                                {"tool": tc.name, "args": tc.arguments, "success": tool_result.success},
                             )
+                        else:
+                            # HITL approval
+                            from src.guardrails.hitl import HITLGuard
+                            hitl = HITLGuard(
+                                timeout=self._config.get("guardrails", {}).get("hitl", {}).get("timeout", 30)
+                            )
+                            hitl_result = await hitl.request_approval(action)
+                            if hitl_result.blocked:
+                                tool_result = ToolResult(
+                                    tool_call_id=tc.id,
+                                    tool_name=tc.name,
+                                    success=False,
+                                    stdout="",
+                                    stderr=f"HITL rejected: {hitl_result.reason}",
+                                    exit_code=-1,
+                                )
+                                await self._memory.log_audit(
+                                    session.id, "hitl_reject",
+                                    {"tool": tc.name, "args": tc.arguments, "reason": hitl_result.reason},
+                                )
+                            else:
+                                tool_result = await execute_tool(tc, timeout=self._shell_timeout)
+                                await self._memory.log_audit(
+                                    session.id, "hitl_approve",
+                                    {"tool": tc.name, "args": tc.arguments},
+                                )
                     else:
                         consecutive_blocks = 0
                         tool_result = await execute_tool(tc, timeout=self._shell_timeout)
