@@ -1,0 +1,1 @@
+"""Feedback package — structured feedback from tool execution results."""
