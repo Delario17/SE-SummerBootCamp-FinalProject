@@ -13,7 +13,7 @@ class CommandClassifier:
         ]
 
     async def check(self, action: Action) -> GuardrailResult:
-        """Classify the command in the action. Does not block — just labels."""
+        """Classify the command in the action. Blocks dangerous commands."""
         if action.tool_name != "run_shell":
             return GuardrailResult(
                 allowed=True, level="safe",
@@ -29,11 +29,13 @@ class CommandClassifier:
 
         for pattern, level in self._rules:
             if pattern.search(cmd):
+                is_blocked = (level == "dangerous")
                 return GuardrailResult(
-                    allowed=True, level=level,
+                    allowed=not is_blocked,
+                    level=level,
                     reason=f"Command classified as {level}",
-                    requires_hitl=(level == "dangerous"),
-                    blocked=False,
+                    requires_hitl=False,
+                    blocked=is_blocked,
                 )
 
         return GuardrailResult(

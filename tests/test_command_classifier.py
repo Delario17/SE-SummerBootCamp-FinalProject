@@ -58,7 +58,7 @@ async def test_classify_dangerous_commands(classifier):
     for cmd in dangerous_cmds:
         action = Action(tool_name="run_shell", arguments={"cmd": cmd})
         result = await classifier.check(action)
-        assert result.blocked is False, f"Command '{cmd}' should be dangerous (not blocked, just classified)"
+        assert result.blocked is True, f"Command '{cmd}' should be blocked as dangerous"
         assert result.level == "dangerous"
 
 
