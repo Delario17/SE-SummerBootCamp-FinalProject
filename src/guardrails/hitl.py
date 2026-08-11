@@ -16,13 +16,21 @@ class HITLGuard:
         self._input_func = input_func or input
 
     async def check(self, action: Action) -> GuardrailResult:
-        """Check if the action requires HITL approval."""
+        """Check if the action requires HITL approval. Does not prompt.
+
+        The pipeline only evaluates -- actual prompting is done by the agent
+        loop when requires_hitl is True.
+        """
         if action.tool_name != "run_shell":
             return GuardrailResult(
                 allowed=True, level="safe",
                 reason=None, requires_hitl=False, blocked=False,
             )
-        return await self.request_approval(action)
+        return GuardrailResult(
+            allowed=True, level="dangerous",
+            reason="requires human approval",
+            requires_hitl=True, blocked=False,
+        )
 
     async def request_approval(self, action: Action) -> GuardrailResult:
         """Request human approval for a dangerous action."""

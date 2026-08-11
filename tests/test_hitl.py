@@ -19,7 +19,7 @@ async def test_hitl_rejects_on_no():
     """User inputs 'n' — action should be blocked."""
     hitl = HITLGuard(timeout=30, input_func=lambda _: "n")
     action = Action(tool_name="run_shell", arguments={"cmd": "rm -rf ./tmp"})
-    result = await hitl.check(action)
+    result = await hitl.request_approval(action)
     assert result.blocked is True
     assert "rejected" in result.reason.lower()
 
@@ -29,7 +29,7 @@ async def test_hitl_rejects_on_timeout():
     """No response within timeout — action should be blocked."""
     hitl = HITLGuard(timeout=0.01, input_func=lambda _: None)  # returns None → timeout
     action = Action(tool_name="run_shell", arguments={"cmd": "rm -rf ./tmp"})
-    result = await hitl.check(action)
+    result = await hitl.request_approval(action)
     assert result.blocked is True
     assert "timeout" in result.reason.lower()
 

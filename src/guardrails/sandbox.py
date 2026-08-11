@@ -1,9 +1,9 @@
-"""Sandbox executor — runs commands in a restricted environment."""
+"""Sandbox executor -- runs commands in a restricted environment."""
 import asyncio
 import tempfile
 import os
 from pathlib import Path
-from src.models import Action, ToolResult
+from src.models import Action, GuardrailResult, ToolResult
 
 
 class SandboxExecutor:
@@ -12,6 +12,13 @@ class SandboxExecutor:
     def __init__(self, memory_limit_mb: int = 512, cpu_time_limit: int = 30):
         self._memory_limit_mb = memory_limit_mb
         self._cpu_time_limit = cpu_time_limit
+
+    async def check(self, action: Action) -> GuardrailResult:
+        """Sandbox executor check always passes (execution happens separately)."""
+        return GuardrailResult(
+            allowed=True, level="safe",
+            reason=None, requires_hitl=False, blocked=False,
+        )
 
     async def execute(self, action: Action) -> ToolResult:
         """Execute a command in a sandboxed temporary directory.

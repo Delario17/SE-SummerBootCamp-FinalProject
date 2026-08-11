@@ -33,11 +33,15 @@ class GuardrailPipeline:
 
     async def check(self, action: Action) -> GuardrailResult:
         """Run all guardrail layers in order. Returns first blocking result."""
+        last_result = None
         for layer in self._layers:
             result = await layer.check(action)
             if result.blocked:
                 return result
-        return GuardrailResult(
+            # Preserve the last meaningful result (skip neutral pass-through)
+            if result.level != "safe" or result.reason is not None:
+                last_result = result
+        return last_result or GuardrailResult(
             allowed=True, level="safe",
             reason=None, requires_hitl=False, blocked=False,
         )
