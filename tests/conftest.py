@@ -1,19 +1,19 @@
 """Shared test fixtures."""
 import pytest
 import tempfile
-import os
+import typing
 from pathlib import Path
 
 
 @pytest.fixture
-def temp_dir():
+def temp_dir() -> Path:
     """Create a temporary directory for testing."""
     with tempfile.TemporaryDirectory() as d:
         yield Path(d)
 
 
 @pytest.fixture
-def sample_config_dict():
+def sample_config_dict() -> dict[str, typing.Any]:
     """Return a minimal valid config dict for testing."""
     return {
         "loop": {"max_turns": 20, "idle_timeout": 3},
