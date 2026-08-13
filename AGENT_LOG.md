@@ -138,19 +138,35 @@
 - 合并 `brainstorming` 到 `main`（Fast-forward）
 - 删除 feature 分支
 
-### 10:30 — CI 迁移
-
-**变更**：将 `.gitlab-ci.yml` 替换为 `.github/workflows/test.yml`（GitHub Actions）
-
-**原因**：学生选择使用 GitHub 而非 GitLab。
-
-### 11:00 — TDD CI 红→绿演示
+### 10:30 — CI 迁移 + TDD CI 红→绿演示
 
 **过程**：
 1. 创建 `ci-red` 分支（仅含脚手架 + CI 配置，0 个测试）
 2. 推送 `ci-red` 到 `main` → CI 触发，0 tests collected → **红色**
 3. 推送真正的 `main`（112 测试）→ CI 触发，全部通过 → **绿色**
 4. 删除 `ci-red` 分支
+
+### 14:00 — 移除 Web 仪表盘
+
+**变更**：根据学生要求，移除整个 Web 仪表盘及相关依赖。
+
+**具体操作**：
+- 删除 `src/web/` 目录（app.py, routes.py, templates/index.html）
+- 删除 `tests/test_web.py`
+- 从 `src/cli/main.py` 移除 `web` 命令
+- 从 `src/harness.yaml` 移除 `web:` 配置段
+- 从 `pyproject.toml` 移除 fastapi、uvicorn、jinja2、pydantic 依赖
+- 更新所有测试和配置文件中引用的 `web` 键
+- 更新 README.md 移除 Web 仪表盘和部署章节
+- 更新 `src/config/loader.py` 的 `REQUIRED_TOP_KEYS`
+
+**原因**：学生认为该项目不需要 Web 仪表盘。
+
+**测试**：107 测试通过（移除 Web 后减少 5 个测试）。
+
+### 15:00 — 文档补充
+
+**变更**：创建 `spec/SPEC_PROCESS.md` 和 `AGENT_LOG.md`（本文件）。
 
 ---
 
@@ -160,10 +176,10 @@
 |------|-----|
 | 总任务数 | 23 |
 | 完成率 | 100% (23/23) |
-| 测试总数 | 112 |
-| 测试通过率 | 100% (112/112) |
-| 总提交数 | 27 |
-| 总代码行 | ~8260 |
+| 测试总数 | 107 |
+| 测试通过率 | 100% (107/107) |
+| 总提交数 | 31 |
+| 总代码行 | ~8000 |
 | 审查轮次 | 6（Task 1: 1轮, Task 2: 1轮, 其余: 0轮） |
 | 使用的子智能体数 | 23 |
-| 人工干预次数 | 3（语言选择、中转站 API、阿里云部署） |
+| 人工干预次数 | 4（语言选择、中转站 API、阿里云部署、移除 Web 仪表盘） |
