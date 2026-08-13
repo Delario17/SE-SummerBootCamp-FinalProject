@@ -44,13 +44,6 @@ harness run "Run pytest on the tests/ directory and fix any failures"
 harness status
 ```
 
-### 4. 启动 Web 仪表盘
-
-```bash
-harness web
-# 访问 http://localhost:8080
-```
-
 ## 配置
 
 配置文件为 `harness.yaml`（项目根目录）或 `~/.harness/config.yaml`。
@@ -89,16 +82,6 @@ guardrails:
 git clone <repo>
 pip install -e ".[dev]"
 pytest tests/ -v
-```
-
-## 部署
-
-### 阿里云 ECS
-
-```bash
-scp -r dist/* user@server:/opt/harness/
-ssh user@server
-sudo systemctl start harness-web
 ```
 
 ## 目录结构

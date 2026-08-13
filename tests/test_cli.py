@@ -14,7 +14,6 @@ def test_cli_help(runner):
     assert result.exit_code == 0
     assert "run" in result.output
     assert "setup" in result.output
-    assert "web" in result.output
 
 
 def test_cli_run_help(runner):
@@ -24,11 +23,6 @@ def test_cli_run_help(runner):
 
 def test_cli_setup_help(runner):
     result = runner.invoke(cli, ["setup", "--help"])
-    assert result.exit_code == 0
-
-
-def test_cli_web_help(runner):
-    result = runner.invoke(cli, ["web", "--help"])
     assert result.exit_code == 0
 
 

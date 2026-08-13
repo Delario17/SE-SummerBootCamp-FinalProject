@@ -39,5 +39,4 @@ def sample_config_dict() -> dict[str, typing.Any]:
             "sandbox": {"enabled": False, "memory_limit_mb": 512, "cpu_time_limit": 30},
         },
         "memory": {"db_path": ":memory:", "max_context_turns": 10},
-        "web": {"host": "0.0.0.0", "port": 8080},
     }

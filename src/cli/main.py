@@ -146,15 +146,5 @@ def status():
         click.echo(f"  Config: not found")
 
 
-@cli.command()
-@click.option("--host", default="0.0.0.0", help="Host to bind to.")
-@click.option("--port", default=8080, help="Port to listen on.")
-def web(host: str, port: int):
-    """Start the web dashboard."""
-    import uvicorn
-    click.echo(f"Starting web dashboard at http://{host}:{port}")
-    uvicorn.run("src.web.app:app", host=host, port=port, reload=False)
-
-
 if __name__ == "__main__":
     cli()

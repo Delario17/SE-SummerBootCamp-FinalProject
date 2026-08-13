@@ -73,7 +73,6 @@ async def main():
         "tools": {"allowed": ["read_file", "write_file", "run_shell", "finish"], "shell_timeout": 60},
         "guardrails": {"allowed_paths": ["./"], "command_rules": [], "hitl": {"timeout": 30, "enabled": False}, "sandbox": {"enabled": False}},
         "memory": {"db_path": ":memory:", "max_context_turns": 10},
-        "web": {"host": "0.0.0.0", "port": 8080},
     }
     responses = [
         LLMResponse(

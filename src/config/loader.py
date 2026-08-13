@@ -3,7 +3,7 @@ from pathlib import Path
 import yaml
 
 
-REQUIRED_TOP_KEYS = ["loop", "llm", "tools", "guardrails", "memory", "web"]
+REQUIRED_TOP_KEYS = ["loop", "llm", "tools", "guardrails", "memory"]
 
 
 class ConfigLoader:
