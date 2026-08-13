@@ -12,3 +12,4 @@ htmlcov/
 *.db
 .venv/
 venv/
+.DS_Store
