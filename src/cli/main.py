@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 @click.group()
-@click.version_option(version="0.1.0")
+@click.version_option(version="0.1.1")
 def cli():
     """AI4SE Coding Agent Harness — a governable, observable coding agent runtime."""
     pass
