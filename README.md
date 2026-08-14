@@ -15,6 +15,14 @@
 
 ## 安装
 
+### 从 GitHub Release 安装
+
+```bash
+pip install git+https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git@v0.1.0
+```
+
+### 从源码安装
+
 ```bash
 git clone https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git
 cd SE-SummerBootCamp-FinalProject
