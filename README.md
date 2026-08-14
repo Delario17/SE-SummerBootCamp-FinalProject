@@ -15,8 +15,18 @@
 
 ## 安装
 
+### 从 GitHub Release 安装
+
 ```bash
-pip install ai4se-harness
+pip install https://github.com/Delario17/SE-SummerBootCamp-FinalProject/releases/download/v0.1.0/ai4se_harness-0.1.0-py3-none-any.whl
+```
+
+### 从源码安装
+
+```bash
+git clone https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git
+cd SE-SummerBootCamp-FinalProject
+pip install -e ".[dev]"
 ```
 
 ## 快速开始
@@ -25,13 +35,13 @@ pip install ai4se-harness
 
 ```bash
 harness setup
-# 按提示输入 API Key（隐藏输入）
+# 按提示输入 API Key（隐藏输入），自动存入系统密钥链
 ```
 
 ### 2. 运行任务
 
 ```bash
-# 使用 Mock LLM（测试用）
+# 使用 Mock LLM（测试用，无需真实 API Key）
 harness run "Fix failing tests in src/" --mock
 
 # 使用真实 LLM
@@ -42,6 +52,29 @@ harness run "Run pytest on the tests/ directory and fix any failures"
 
 ```bash
 harness status
+```
+
+## 使用示例
+
+### 护栏拦截危险操作
+
+```bash
+echo 'rm -rf /' > /tmp/dangerous.sh
+harness run "Execute /tmp/dangerous.sh" --mock
+```
+
+### 反馈回路驱动自我修正
+
+```bash
+harness run "Fix the failing test in tests/test_feedback.py" --mock
+```
+
+### 运行演示脚本
+
+```bash
+python demo/demo1_guardrail_intercept.py
+python demo/demo2_feedback_loop.py
+python demo/demo3_guardrail_pipeline.py
 ```
 
 ## 配置
@@ -79,7 +112,7 @@ guardrails:
 ## 开发
 
 ```bash
-git clone <repo>
+git clone https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git
 pip install -e ".[dev]"
 pytest tests/ -v
 ```
