@@ -17,16 +17,20 @@
 
 ### 从 GitHub Release 安装
 
-```bash
-pip install git+https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git@v0.1.0
-```
+1. 打开 [Releases 页面](https://github.com/Delario17/SE-SummerBootCamp-FinalProject/releases/tag/v0.1.0)
+2. 下载 `Source code (tar.gz)` 或 `Source code (zip)`
+3. 解压后安装：
 
-> 若遇到 `Error in the HTTP2 framing layer` 错误，请先执行 `git config --global http.version HTTP/1.1` 后重试。
+```bash
+tar -xzf SE-SummerBootCamp-FinalProject-0.1.0.tar.gz
+cd SE-SummerBootCamp-FinalProject-0.1.0
+pip install .
+```
 
 ### 从源码安装
 
 ```bash
-git -c http.version=HTTP/1.1 clone https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git
+git clone https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git
 cd SE-SummerBootCamp-FinalProject
 pip install .
 ```
