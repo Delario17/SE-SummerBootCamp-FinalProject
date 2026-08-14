@@ -46,9 +46,11 @@ class AgentLoop:
         self._allowed_tools = self._tools_config.get("allowed", [])
         self._shell_timeout = self._tools_config.get("shell_timeout", 60)
         self._guardrail_pipeline = create_guardrail_pipeline(config)
-        self._memory = MemoryStore(
-            db_path=config.get("memory", {}).get("db_path", ":memory:")
-        )
+        from pathlib import Path
+        db_path = config.get("memory", {}).get("db_path", ":memory:")
+        if db_path != ":memory:":
+            db_path = str(Path(db_path).expanduser())
+        self._memory = MemoryStore(db_path=db_path)
         self._max_context_turns = config.get("memory", {}).get("max_context_turns", 10)
 
     async def run(self, task: str, llm_backend: LLMBackend) -> LoopResult:

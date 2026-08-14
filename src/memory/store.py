@@ -15,6 +15,10 @@ class MemoryStore:
 
     def _get_conn(self) -> sqlite3.Connection:
         if self._conn is None:
+            # Ensure parent directory exists (e.g. ~/.harness/)
+            if self.db_path != ":memory:":
+                from pathlib import Path
+                Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
             self._conn = sqlite3.connect(self.db_path)
             self._conn.row_factory = sqlite3.Row
             self._create_tables()

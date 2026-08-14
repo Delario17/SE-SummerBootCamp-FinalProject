@@ -24,9 +24,12 @@ def test_load_valid_config(config_file, sample_config_dict):
 
 
 def test_load_missing_file():
+    """When config file is missing, loader falls back to built-in defaults."""
     loader = ConfigLoader()
-    with pytest.raises(FileNotFoundError):
-        loader.load("/nonexistent/config.yaml")
+    config = loader.load("/nonexistent/config.yaml")
+    # Should return built-in defaults, not raise
+    assert config["loop"]["max_turns"] == 20
+    assert config["llm"]["model"] == "gpt-4o"
 
 
 def test_load_invalid_yaml(temp_dir):

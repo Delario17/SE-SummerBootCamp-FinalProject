@@ -34,12 +34,8 @@ def run(task: str, config: str, mock: bool):
     loader = ConfigLoader()
     try:
         cfg = loader.load(config)
-    except FileNotFoundError:
-        click.echo(
-            f"Config file not found: {config}\n"
-            f"Run 'harness setup' to configure the harness.",
-            err=True,
-        )
+    except ValueError as e:
+        click.echo(f"Config error: {e}", err=True)
         sys.exit(1)
 
     if mock:
@@ -127,7 +123,7 @@ def status():
     USERNAME = "api_key"
 
     click.echo("Harness Status:")
-    click.echo(f"  Version: 0.1.0")
+    click.echo(f"  Version: 0.1.1")
 
     api_key = keyring.get_password(SERVICE, USERNAME)
     if api_key:
