@@ -21,10 +21,12 @@
 pip install git+https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git@v0.1.0
 ```
 
+> 若遇到 `Error in the HTTP2 framing layer` 错误，请先执行 `git config --global http.version HTTP/1.1` 后重试。
+
 ### 从源码安装
 
 ```bash
-git clone https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git
+git -c http.version=HTTP/1.1 clone https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git
 cd SE-SummerBootCamp-FinalProject
 pip install .
 ```
