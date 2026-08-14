@@ -2,7 +2,7 @@
 
 > **项目**：AI4SE 期末项目 · A 类 · Coding Agent Harness
 > **学生**：王祎（241250007）
-> **日期范围**：2026-08-07 → 2026-08-13
+> **日期范围**：2026-08-07 → 2026-08-14
 
 ---
 
@@ -170,6 +170,85 @@
 
 ---
 
+## 2026-08-14
+
+### 14:00 — 修复 v0.1.0 安装后 `ModuleNotFoundError: No module named 'src'`
+
+**问题**：用户从 GitHub Release 下载 v0.1.0 安装后，运行 `harness setup` 报错 `ModuleNotFoundError: No module named 'src'`。
+
+**根因分析**：
+- `pyproject.toml` 中缺少 `[tool.setuptools.packages.find]` 显式配置
+- setuptools 自动发现将 `src/` 视为包根目录，把 `cli/`、`config/` 等作为顶级包安装到 site-packages
+- 但入口脚本 `harness` 的导入路径是 `src.cli.main:cli`，找不到 `src` 包
+
+**修复**：
+- 在 `pyproject.toml` 中添加 `[tool.setuptools.packages.find]`，`where = ["."]`，`include = ["src", "src.*"]`
+- 版本号更新到 0.1.1
+
+**验证**：107 测试通过，`harness` CLI 正常工作。
+
+**提交**：`0105d53` → tag `v0.1.1`
+
+---
+
+### 14:30 — 修复 `Config file not found: harness.yaml` 及关联问题
+
+**问题**：用户运行 `harness run "..." --mock` 报 `Config file not found: harness.yaml`，随后还出现 `sqlite3.OperationalError: unable to open database file`。
+
+**根因分析**：
+1. `harness.yaml` 在 `src/` 目录下，未包含在 pip 包中（setuptools 默认只打包 .py 文件）
+2. `ConfigLoader.load()` 找不到文件就抛 `FileNotFoundError`，无 fallback 机制
+3. `MemoryStore` 不自动创建 `~/.harness/` 目录，且不展开 `~` 路径
+
+**修复**（共 7 个文件）：
+
+| 文件 | 改动 |
+|------|------|
+| `harness.yaml` | 复制到项目根目录 |
+| `pyproject.toml` | 新增 `[tool.setuptools.package-data]` 打包 `*.yaml` |
+| `src/config/loader.py` | 重写：多位置搜索 + 硬编码内置默认值 fallback |
+| `src/cli/main.py` | 适配新 loader，`FileNotFoundError` → `ValueError` |
+| `src/memory/store.py` | 自动创建 db 父目录 |
+| `src/loop/agent.py` | 展开 `~` 路径 |
+| `tests/test_config.py` | 更新测试反映新行为 |
+
+**配置搜索顺序**：`--config` → `./harness.yaml` → `~/.harness/config.yaml` → 包内置默认 → 硬编码 fallback
+
+**验证**：107 测试通过，`harness run "..." --mock` 在无配置文件的 `/tmp` 目录下成功运行。
+
+**提交**：`6bc50d9` → tag `v0.1.2`
+
+---
+
+### 15:00 — 改进 setup UX 和 status 命令
+
+**问题**：
+1. 首次运行 `harness setup` 时显示"API key 已配置"——实际上 keyring 中残留了之前安装的 key
+2. 已配置 key 时提示 `Use --reset to overwrite or --clear to remove`，但用户不清楚完整命令格式
+3. `setup` 命令没有引导用户配置 `model` 和 `api_base`
+4. `status` 命令不显示 model 和 api_base 信息
+
+**修复**：
+
+**`harness setup` 改进**：
+- 已配置 key 时显示脱敏后的 key（如 `sk-t****cdef`），而非仅显示"已配置"
+- 明确提示完整命令格式：`harness setup --reset` 和 `harness setup --clear`
+- 新增 `_print_config_guide()` 函数，引导用户配置 `model` 和 `api_base`：
+  - 显示当前配置文件位置
+  - 若配置文件不存在，打印示例配置
+  - 提示用户用 `harness status` 验证
+
+**`harness status` 改进**：
+- 显示脱敏后的 API key
+- 显示当前使用的 `Model` 和 `API Base`
+- 无配置文件时提示"using built-in defaults"
+
+**验证**：107 测试通过，`harness setup`、`harness setup --clear`、`harness status` 均正常。
+
+**提交**：`338f18a` → tag `v0.1.3`
+
+---
+
 ## 统计总览
 
 | 指标 | 值 |
@@ -178,8 +257,9 @@
 | 完成率 | 100% (23/23) |
 | 测试总数 | 107 |
 | 测试通过率 | 100% (107/107) |
-| 总提交数 | 31 |
-| 总代码行 | ~8000 |
+| 总提交数 | 34 |
+| 发布版本 | v0.1.0 → v0.1.1 → v0.1.2 → v0.1.3 |
+| 总代码行 | ~8500 |
 | 审查轮次 | 6（Task 1: 1轮, Task 2: 1轮, 其余: 0轮） |
 | 使用的子智能体数 | 23 |
 | 人工干预次数 | 4（语言选择、中转站 API、阿里云部署、移除 Web 仪表盘） |
