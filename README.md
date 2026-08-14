@@ -15,18 +15,10 @@
 
 ## 安装
 
-### 从 GitHub Release 安装
-
-```bash
-pip install https://github.com/Delario17/SE-SummerBootCamp-FinalProject/releases/download/v0.1.0/ai4se_harness-0.1.0-py3-none-any.whl
-```
-
-### 从源码安装
-
 ```bash
 git clone https://github.com/Delario17/SE-SummerBootCamp-FinalProject.git
 cd SE-SummerBootCamp-FinalProject
-pip install -e ".[dev]"
+pip install .
 ```
 
 ## 快速开始
