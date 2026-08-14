@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 @click.group()
-@click.version_option(version="0.1.2")
+@click.version_option(version="1.0.0")
 def cli():
     """AI4SE Coding Agent Harness — a governable, observable coding agent runtime."""
     pass
@@ -178,7 +178,7 @@ def status():
     USERNAME = "api_key"
 
     click.echo("Harness Status:")
-    click.echo(f"  Version: 0.1.2")
+    click.echo(f"  Version: 1.0.0")
 
     api_key = keyring.get_password(SERVICE, USERNAME)
     if api_key:
